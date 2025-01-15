@@ -5,7 +5,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/schemas/user.schema";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { useFirebase } from "@/hooks/use-firebase";
+import {
+  useSignInWithEmailAndPassword,
+  useSignInWithGoogle,
+} from "react-firebase-hooks/auth";
+import { auth } from "@/app/firebase/config";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -19,7 +23,13 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 
 const SignUp = () => {
-  const { signInWithEmailAndPassword, signInWithGoogle } = useFirebase();
+  const [
+    signInWithEmailAndPassword,
+    userEmailAndPassword,
+    emailAndPasswordLoading,
+  ] = useSignInWithEmailAndPassword(auth);
+  const [signInWithGoogle, userGoogle, googleLoading] =
+    useSignInWithGoogle(auth);
   const router = useRouter();
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -41,13 +51,11 @@ const SignUp = () => {
 
   async function onSubmit(values: z.infer<typeof loginSchema>) {
     try {
-      const res = await signInWithEmailAndPassword(
-        values.email,
-        values.password
-      );
-      console.log({ res });
+      await signInWithEmailAndPassword(values.email, values.password);
+
+      router.push("/");
     } catch {
-      console.error("Error creating user with email and password");
+      console.error("Error signin user with email and password");
     }
   }
 
@@ -91,7 +99,9 @@ const SignUp = () => {
           <Button
             className="w-full disabled:bg-current/10"
             type="submit"
-            disabled={formState.isSubmitting}
+            disabled={
+              formState.isSubmitting || emailAndPasswordLoading || googleLoading
+            }
           >
             Submit
           </Button>
@@ -99,6 +109,7 @@ const SignUp = () => {
             className="w-full"
             type="button"
             variant="outline"
+            disabled={emailAndPasswordLoading || googleLoading}
             onClick={() => handleGoogleLogin()}
           >
             Sign in with Google
