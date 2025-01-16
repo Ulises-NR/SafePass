@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { toast } from "sonner";
 
 const SignUp = () => {
   const [
@@ -44,8 +45,9 @@ const SignUp = () => {
     try {
       await signInWithGoogle();
       router.push("/");
+      toast.success("Successfully signed up!");
     } catch {
-      console.error("Error creating user with email and password");
+      toast.error("Failed to sign up with Google");
     }
   }
 
@@ -54,8 +56,9 @@ const SignUp = () => {
       await createUserWithEmailAndPassword(values.email, values.password);
 
       router.push("/");
+      toast.success("Successfully signed up!");
     } catch {
-      console.error("Error creating user with email and password");
+      toast.error("Failed to sign up with email and password");
     }
   }
 
