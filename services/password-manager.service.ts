@@ -56,7 +56,7 @@ const service = {
   },
   async updatePassword(id: string, values: PasswordBody) {
     try {
-      const docRef = doc(db, "password_manager", id);
+      const docRef = doc(db, "password-manager", id);
 
       await updateDoc(docRef, {
         ...(values.account && { account: values.account }),
