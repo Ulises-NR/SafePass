@@ -9,10 +9,11 @@ import { auth } from "@/app/firebase/config";
 import { useRouter } from "next/navigation";
 import { useAppSelector, useAppDispatch } from "@/store";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { PasswordGenerator } from "./components/generate-password";
 import { PasswordCard } from "./components/password-card";
 import { PasswordPagination } from "./components/password-pagination";
-import { getAll } from "@/store/slices/passwordSlice";
+import { getAll, searchPassword } from "@/store/slices/passwordSlice";
 
 const PasswordManager = () => {
   const router = useRouter();
@@ -22,6 +23,10 @@ const PasswordManager = () => {
   );
   const dispatch = useAppDispatch();
   const { handlePageChange } = useSearch();
+
+  const handleInput = (e) => {
+    dispatch(searchPassword(e.target.value));
+  };
 
   useEffect(() => {
     async function fetch() {
@@ -42,8 +47,8 @@ const PasswordManager = () => {
   if (user && !loading) {
     return (
       <>
-        <section className="my-8 p-2 container mx-auto flex items-center justify-between">
-          <h2>Aqui van a ir los filtros</h2>
+        <section className="my-8 p-2 container mx-auto flex items-center justify-between gap-x-2">
+          <Input placeholder="Search by name" onInput={handleInput} />
           <div className="flex items-center gap-x-2">
             <PasswordGenerator />
             <Button asChild>
